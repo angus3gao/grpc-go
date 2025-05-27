@@ -41,6 +41,7 @@ import (
 	iresolver "google.golang.org/grpc/internal/resolver"
 	"google.golang.org/grpc/internal/transport"
 	"google.golang.org/grpc/keepalive"
+	"google.golang.org/grpc/metadata"
 	"google.golang.org/grpc/resolver"
 	"google.golang.org/grpc/serviceconfig"
 	"google.golang.org/grpc/status"
@@ -1062,6 +1063,19 @@ func (cc *ClientConn) getTransport(ctx context.Context, failfast bool, method st
 		Ctx:            ctx,
 		FullMethodName: method,
 	})
+}
+
+func (cc *ClientConn) PickMetadata(ctx context.Context) (metadata.MD, error) {
+	_, pickResult, err := cc.pickerWrapper.pick(ctx, true, balancer.PickInfo{
+		Ctx:            ctx,
+		FullMethodName: "PickMetadata",
+	})
+
+	if err != nil {
+		return nil, err
+	}
+
+	return pickResult.Metadata, nil
 }
 
 func (cc *ClientConn) applyServiceConfigAndBalancer(sc *ServiceConfig, configSelector iresolver.ConfigSelector) {
