@@ -1076,6 +1076,10 @@ func (cc *ClientConn) getTransport(ctx context.Context, failfast bool, method st
 }
 
 func (cc *ClientConn) PickMetadata(ctx context.Context) (metadata.MD, error) {
+	if cc.pickerWrapper == nil {
+		logger.Errorf("PickMetadata.pickerWrapper is nil")
+		return nil, fmt.Errorf("PickMetadata.pickerWrapper is nil")
+	}
 	_, pickResult, err := cc.pickerWrapper.pick(ctx, true, balancer.PickInfo{
 		Ctx:            ctx,
 		FullMethodName: "PickMetadata",
